@@ -1,0 +1,4 @@
+forge-std/=lib/forge-std/src/
+@openzeppelin/=lib/openzeppelin-contracts/
+@vectorized/=lib/dn404/src/
+@uniswap/=lib/v2-periphery/contracts/
