@@ -21,29 +21,39 @@ contract ERC404 is Base {
 
     function testEthereum() external {
         vm.selectFork(forkIDs.mainnet);
-        _deployERC404AndTestFlow(tokenFactoryMainnet, WETH_ETH, userEthereum);
+        _deployERC404AndTestFlow(erc404TokenFactoryMainnet, WETH_ETH, userEthereum);
     }
 
     function testArbitrum() external {
         vm.selectFork(forkIDs.arbitrum);
-        _deployERC404AndTestFlow(tokenFactoryArbitrum, WETH_ARBITRUM, userArbitrum);
+        _deployERC404AndTestFlow(erc404TokenFactoryArbitrum, WETH_ARBITRUM, userArbitrum);
     }
 
-    // function testFraxtal() external {
-    //     vm.selectFork(forkIDs.fraxtal);
-    //     _deployERC404AndTestFlow(tokenFactoryFraxtal, WFRXETH_FRAXTAL, userFraxtal);
-    // }
+    function testFraxtal() external {
+        vm.selectFork(forkIDs.fraxtal);
+        _deployERC404AndTestFlow(erc404TokenFactoryFraxtal, WFRXETH_FRAXTAL, userFraxtal);
+    }
 
     function testAvalanche() external {
         vm.selectFork(forkIDs.avalanche);
-        _deployERC404AndTestFlow(tokenFactoryAvalanche, WAVAX, userAvalanche);
+        _deployERC404AndTestFlow(erc404TokenFactoryAvalanche, WAVAX, userAvalanche);
+    }
+
+    function testGoerli() external {
+        vm.selectFork(forkIDs.goerli);
+        _deployERC404AndTestFlow(erc404TokenFactoryGoerli, WETH_GOERLI, userGoerli);
+    }
+
+    function testSepolia() external {
+        vm.selectFork(forkIDs.sepolia);
+        _deployERC404AndTestFlow(erc404TokenFactorySepolia, WETH_SEPOLIA, userSepolia);
     }
 
     // ============================================================================================
     // Internal Functions
     // ============================================================================================
 
-    function _deployERC404AndTestFlow(TokenFactory _factory, IERC20 _wnt, address _user) internal {
+    function _deployERC404AndTestFlow(ERC404TokenFactory _factory, IERC20 _wnt, address _user) internal {
         vm.startPrank(_user);
 
         _wnt.forceApprove(address(_factory), 10 ether);

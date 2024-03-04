@@ -6,7 +6,7 @@ import {DN404Mirror} from "@vectorized/DN404Mirror.sol";
 
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
-import {BaseToken, TaxHelper, IUniswapV2Router01, IERC20} from "./BaseToken.sol";
+import {BaseToken, TaxHelper, IUniswapV2Router01, IERC20} from "../BaseToken.sol";
 
 /// @title BaseERC404
 /// @notice A standard ERC404 token

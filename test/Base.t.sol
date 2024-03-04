@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -7,7 +7,10 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IUniswapV2Router01} from "@uniswap-periphery/interfaces/IUniswapV2Router01.sol";
 import {IUniswapV2Factory} from "@uniswap-core/interfaces/IUniswapV2Factory.sol";
 
-import {BaseToken, TaxHelper, TokenFactory} from "src/TokenFactory.sol";
+import {TaxHelper} from "src/TaxHelper.sol";
+import {ERC20TokenFactory} from "src/ERC20/ERC20TokenFactory.sol";
+import {ERC404TokenFactory} from "src/ERC404/ERC404TokenFactory.sol";
+import {BaseToken} from "src/BaseToken.sol";
 
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
@@ -21,6 +24,8 @@ abstract contract Base is Test {
         uint256 arbitrum;
         uint256 fraxtal;
         uint256 avalanche;
+        uint256 goerli;
+        uint256 sepolia;
     }
 
     ForkIDs public forkIDs;
@@ -29,28 +34,43 @@ abstract contract Base is Test {
     address payable public userArbitrum;
     address payable public userFraxtal;
     address payable public userAvalanche;
+    address payable public userGoerli;
+    address payable public userSepolia;
 
     address public constant TREASURY = address(0xD8984d5D0A68FD6ec1051C638906de686cD696E2);
 
     IERC20 public constant WETH_ETH = IERC20(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
     IERC20 public constant WETH_ARBITRUM = IERC20(0x82aF49447D8a07e3bd95BD0d56f35241523fBab1);
-    // IERC20 public constant WFRXETH_FRAXTAL = IERC20(0xfc00000000000000000000000000000000000006);
+    IERC20 public constant WFRXETH_FRAXTAL = IERC20(0xFC00000000000000000000000000000000000006);
     IERC20 public constant WAVAX = IERC20(0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7);
+    IERC20 public constant WETH_GOERLI = IERC20(0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6);
+    IERC20 public constant WETH_SEPOLIA = IERC20(0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9);
 
-    IUniswapV2Router01 public constant UNIV2_ROUTER_ETH = IUniswapV2Router01(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
+    IUniswapV2Router01 public constant UNIV2_ROUTER_ETH = IUniswapV2Router01(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D); // also on Goerli
     IUniswapV2Router01 public constant UNIV2_ROUTER_ARBITRUM = IUniswapV2Router01(0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24);
-    // IUniswapV2Router01 public constant UNIV2_ROUTER_FRAXTAL = IUniswapV2Router01(0);
+    IUniswapV2Router01 public constant UNIV2_ROUTER_FRAXTAL = IUniswapV2Router01(0x2Dd1B4D4548aCCeA497050619965f91f78b3b532);
     IUniswapV2Router01 public constant UNIV2_ROUTER_AVAX = IUniswapV2Router01(0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24);
+    IUniswapV2Router01 public constant UNIV2_ROUTER_SEPOLIA = IUniswapV2Router01(0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008);
 
-    IUniswapV2Factory public constant UNIV2_FACTORY_ETH = IUniswapV2Factory(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f);
+    IUniswapV2Factory public constant UNIV2_FACTORY_ETH = IUniswapV2Factory(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f); // also on Goerli
     IUniswapV2Factory public constant UNIV2_FACTORY_ARBITRUM = IUniswapV2Factory(0xf1D7CC64Fb4452F05c498126312eBE29f30Fbcf9);
-    // IUniswapV2Factory public constant UNIV2_FACTORY_FRAXTAL = IUniswapV2Factory(0);
+    IUniswapV2Factory public constant UNIV2_FACTORY_FRAXTAL = IUniswapV2Factory(0xE30521fe7f3bEB6Ad556887b50739d6C7CA667E6);
     IUniswapV2Factory public constant UNIV2_FACTORY_AVAX = IUniswapV2Factory(0x9e5A52f57b3038F1B8EeE45F28b3C1967e22799C);
+    IUniswapV2Factory public constant UNIV2_FACTORY_SEPOLIA = IUniswapV2Factory(0x7E0987E5b3a30e3f2828572Bb659A548460a3003);
 
-    TokenFactory public tokenFactoryMainnet;
-    TokenFactory public tokenFactoryArbitrum;
-    // TokenFactory public tokenFactoryFraxtal;
-    TokenFactory public tokenFactoryAvalanche;
+    ERC20TokenFactory public erc20TokenFactoryMainnet;
+    ERC20TokenFactory public erc20TokenFactoryArbitrum;
+    ERC20TokenFactory public erc20TokenFactoryFraxtal;
+    ERC20TokenFactory public erc20TokenFactoryAvalanche;
+    ERC20TokenFactory public erc20TokenFactoryGoerli;
+    ERC20TokenFactory public erc20TokenFactorySepolia;
+
+    ERC404TokenFactory public erc404TokenFactoryMainnet;
+    ERC404TokenFactory public erc404TokenFactoryArbitrum;
+    ERC404TokenFactory public erc404TokenFactoryFraxtal;
+    ERC404TokenFactory public erc404TokenFactoryAvalanche;
+    ERC404TokenFactory public erc404TokenFactoryGoerli;
+    ERC404TokenFactory public erc404TokenFactorySepolia;
 
     // ============================================================================================
     // Test Setup
@@ -62,37 +82,50 @@ abstract contract Base is Test {
             mainnet: vm.createFork(vm.envString("ETHEREUM_RPC_URL")),
             arbitrum: vm.createFork(vm.envString("ARBITRUM_RPC_URL")),
             fraxtal: vm.createFork(vm.envString("FRAXTAL_RPC_URL")),
-            avalanche: vm.createFork(vm.envString("AVALANCHE_RPC_URL"))
+            avalanche: vm.createFork(vm.envString("AVALANCHE_RPC_URL")),
+            goerli: vm.createFork(vm.envString("GOERLI_RPC_URL")),
+            sepolia: vm.createFork(vm.envString("SEPOLIA_RPC_URL"))
         });
 
         // deploy on Ethereum
         vm.selectFork(forkIDs.mainnet);
         userEthereum = _createUser(WETH_ETH);
-        tokenFactoryMainnet = _deployFactory(WETH_ETH, UNIV2_ROUTER_ETH, UNIV2_FACTORY_ETH);
+        (erc20TokenFactoryMainnet, erc404TokenFactoryMainnet) = _deployFactory(WETH_ETH, UNIV2_ROUTER_ETH, UNIV2_FACTORY_ETH);
 
         // deploy on Arbitrum
         vm.selectFork(forkIDs.arbitrum);
         userArbitrum = _createUser(WETH_ARBITRUM);
-        tokenFactoryArbitrum = _deployFactory(WETH_ARBITRUM, UNIV2_ROUTER_ARBITRUM, UNIV2_FACTORY_ARBITRUM);
+        (erc20TokenFactoryArbitrum, erc404TokenFactoryArbitrum) = _deployFactory(WETH_ARBITRUM, UNIV2_ROUTER_ARBITRUM, UNIV2_FACTORY_ARBITRUM);
 
-        // // deploy on Fraxtal
-        // vm.selectFork(forkIDs.fraxtal);
-        // userFraxtal = _createUser(WFRXETH_FRAXTAL);
-        // tokenFactoryFraxtal = _deployFactory(WFRXETH_FRAXTAL, UNIV2_ROUTER_FRAXTAL, UNIV2_FACTORY_FRAXTAL);
+        // deploy on Fraxtal
+        vm.selectFork(forkIDs.fraxtal);
+        userFraxtal = _createUser(WFRXETH_FRAXTAL);
+        (erc20TokenFactoryFraxtal, erc404TokenFactoryFraxtal) = _deployFactory(WFRXETH_FRAXTAL, UNIV2_ROUTER_FRAXTAL, UNIV2_FACTORY_FRAXTAL);
 
         // deploy on Avalanche
         vm.selectFork(forkIDs.avalanche);
         userAvalanche = _createUser(WAVAX);
-        tokenFactoryAvalanche = _deployFactory(WAVAX, UNIV2_ROUTER_AVAX, UNIV2_FACTORY_AVAX);
+        (erc20TokenFactoryAvalanche, erc404TokenFactoryAvalanche) = _deployFactory(WAVAX, UNIV2_ROUTER_AVAX, UNIV2_FACTORY_AVAX);
+
+        // deploy on Goerli
+        vm.selectFork(forkIDs.goerli);
+        userGoerli = _createUser(WETH_GOERLI);
+        (erc20TokenFactoryGoerli, erc404TokenFactoryGoerli) = _deployFactory(WETH_GOERLI, UNIV2_ROUTER_ETH, UNIV2_FACTORY_ETH);
+
+        // deploy on Sepolia
+        vm.selectFork(forkIDs.sepolia);
+        userSepolia = _createUser(WETH_SEPOLIA);
+        (erc20TokenFactorySepolia, erc404TokenFactorySepolia) = _deployFactory(WETH_SEPOLIA, UNIV2_ROUTER_SEPOLIA, UNIV2_FACTORY_SEPOLIA);
     }
 
     // ============================================================================================
     // Internal Functions
     // ============================================================================================
 
-    function _deployFactory(IERC20 _wnt, IUniswapV2Router01 _univ2router, IUniswapV2Factory _univ2factory) internal returns (TokenFactory _factory) {
+    function _deployFactory(IERC20 _wnt, IUniswapV2Router01 _univ2router, IUniswapV2Factory _univ2factory) internal returns (ERC20TokenFactory _erc20Factory, ERC404TokenFactory _erc404Factory) {
         TaxHelper _taxHelper = new TaxHelper();
-        _factory = new TokenFactory(_wnt, _univ2router, _univ2factory, _taxHelper, TREASURY);
+        _erc20Factory = new ERC20TokenFactory(_wnt, _univ2router, _univ2factory, _taxHelper, TREASURY);
+        _erc404Factory = new ERC404TokenFactory(_wnt, _univ2router, _univ2factory, _taxHelper, TREASURY);
     }
 
     function _createUser(IERC20 _wnt) internal returns (address payable _user) {

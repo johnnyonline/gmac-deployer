@@ -2,17 +2,15 @@
 pragma solidity 0.8.23;
 
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import {IUniswapV2Router01} from "@uniswap-periphery/interfaces/IUniswapV2Router01.sol";
 import {IUniswapV2Factory} from "@uniswap-core/interfaces/IUniswapV2Factory.sol";
 
-import {BaseERC20, BaseToken, TaxHelper, IERC20} from "./BaseERC20.sol";
-import {BaseERC404} from "./BaseERC404.sol";
+import {TaxHelper, SafeERC20, IERC20} from "./TaxHelper.sol";
 
-/// @title TokenFactory
-/// @notice A factory contract to create new non-ruggable ERC20/ERC404 tokens
-contract TokenFactory is ReentrancyGuard {
+/// @title BaseFactory
+/// @notice A base factory contract to create new non-ruggable ERC20/ERC404 tokens
+abstract contract BaseFactory is ReentrancyGuard {
 
     using SafeERC20 for IERC20;
 
@@ -42,63 +40,6 @@ contract TokenFactory is ReentrancyGuard {
         taxHelper = _taxHelper;
 
         treasury = _treasury;
-    }
-
-    // ============================================================================================
-    // External Functions
-    // ============================================================================================
-
-    /// @notice Create a new ERC20 token, add liquidity and burn the LP tokens
-    /// @param _name The token name
-    /// @param _symbol The token symbol
-    /// @param _totalSupply The total supply
-    /// @param _wntAmount The WNT amount
-    /// @return The pair address and the token address
-    function createERC20(
-        string memory _name,
-        string memory _symbol,
-        uint256 _totalSupply,
-        uint256 _wntAmount
-    ) external nonReentrant returns (address, address) {
-        BaseERC20 _token = new BaseERC20(
-            wnt,
-            univ2router,
-            taxHelper,
-            treasury,
-            _name,
-            _symbol,
-            _totalSupply
-        );
-
-        return (_addLiquidityAndBurn(_wntAmount, address(_token)), address(_token));
-    }
-
-    /// @notice Create a new ERC404 token, add liquidity and burn the LP tokens
-    /// @param _name The token name
-    /// @param _symbol The token symbol
-    /// @param _baseURI The base URI
-    /// @param _totalSupply The total supply
-    /// @param _wntAmount The WNT amount
-    /// @return The pair address and the token address
-    function createERC404(
-        string memory _name,
-        string memory _symbol,
-        string memory _baseURI,
-        uint96 _totalSupply,
-        uint256 _wntAmount
-    ) external nonReentrant returns (address, address) {
-        BaseERC404 _token = new BaseERC404(
-            wnt,
-            univ2router,
-            taxHelper,
-            treasury,
-            _name,
-            _symbol,
-            _baseURI,
-            _totalSupply
-        );
-
-        return (_addLiquidityAndBurn(_wntAmount, address(_token)), address(_token));
     }
 
     // ============================================================================================
@@ -138,6 +79,7 @@ contract TokenFactory is ReentrancyGuard {
     // ============================================================================================
 
     event AddLiquidityAndBurn(uint256 amountToken, uint256 amountWNT, uint256 liquidity, address pair);
+    event TokenCreated(address token, string name, string symbol, uint256 totalSupply);
 
     // ============================================================================================
     // Errors

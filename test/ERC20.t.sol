@@ -21,29 +21,39 @@ contract ERC20 is Base {
 
     function testEthereum() external {
         vm.selectFork(forkIDs.mainnet);
-        _deployERC20AndTestFlow(tokenFactoryMainnet, WETH_ETH, userEthereum);
+        _deployERC20AndTestFlow(erc20TokenFactoryMainnet, WETH_ETH, userEthereum);
     }
 
     function testArbitrum() external {
         vm.selectFork(forkIDs.arbitrum);
-        _deployERC20AndTestFlow(tokenFactoryArbitrum, WETH_ARBITRUM, userArbitrum);
+        _deployERC20AndTestFlow(erc20TokenFactoryArbitrum, WETH_ARBITRUM, userArbitrum);
     }
 
-    // function testFraxtal() external {
-    //     vm.selectFork(forkIDs.fraxtal);
-    //     _deployERC20AndTestFlow(tokenFactoryFraxtal, WFRXETH_FRAXTAL, userFraxtal);
-    // }
+    function testFraxtal() external {
+        vm.selectFork(forkIDs.fraxtal);
+        _deployERC20AndTestFlow(erc20TokenFactoryFraxtal, WFRXETH_FRAXTAL, userFraxtal);
+    }
 
     function testAvalanche() external {
         vm.selectFork(forkIDs.avalanche);
-        _deployERC20AndTestFlow(tokenFactoryAvalanche, WAVAX, userAvalanche);
+        _deployERC20AndTestFlow(erc20TokenFactoryAvalanche, WAVAX, userAvalanche);
+    }
+
+    function testGoerli() external {
+        vm.selectFork(forkIDs.goerli);
+        _deployERC20AndTestFlow(erc20TokenFactoryGoerli, WETH_GOERLI, userGoerli);
+    }
+
+    function testSepolia() external {
+        vm.selectFork(forkIDs.sepolia);
+        _deployERC20AndTestFlow(erc20TokenFactorySepolia, WETH_SEPOLIA, userSepolia);
     }
 
     // ============================================================================================
     // Internal Functions
     // ============================================================================================
 
-    function _deployERC20AndTestFlow(TokenFactory _factory, IERC20 _wnt, address _user) internal {
+    function _deployERC20AndTestFlow(ERC20TokenFactory _factory, IERC20 _wnt, address _user) internal {
         vm.startPrank(_user);
 
         _wnt.forceApprove(address(_factory), 10 ether);

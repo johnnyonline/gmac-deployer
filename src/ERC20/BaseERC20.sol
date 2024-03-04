@@ -3,7 +3,7 @@ pragma solidity 0.8.23;
 
 import {ERC20, ERC20Capped} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Capped.sol";
 
-import {BaseToken, TaxHelper, IUniswapV2Router01, IERC20} from "./BaseToken.sol";
+import {BaseToken, TaxHelper, IUniswapV2Router01, IERC20} from "../BaseToken.sol";
 
 /// @title BaseERC20
 /// @notice A standard ERC20 token
