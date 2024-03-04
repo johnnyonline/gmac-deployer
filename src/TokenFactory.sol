@@ -34,6 +34,8 @@ contract TokenFactory is ReentrancyGuard {
         FeeHelper _feeHelper,
         address _treasury
     ) {
+        if (_treasury == address(0)) revert InvalidAddress();
+
         wnt = _wnt;
         univ2router = _univ2router;
         univ2factory = _univ2factory;
@@ -108,6 +110,7 @@ contract TokenFactory is ReentrancyGuard {
 
         uint256 _amountToken = IERC20(_token).balanceOf(address(this));
         uint256 _amountWNT = wnt.balanceOf(address(this));
+        // slither-disable-next-line incorrect-equality
         if (_amountToken == 0 || _amountWNT == 0) revert InvalidAmount();
 
         _pair = univ2factory.createPair(_token, address(wnt));
@@ -141,4 +144,5 @@ contract TokenFactory is ReentrancyGuard {
     // ============================================================================================
 
     error InvalidAmount();
+    error InvalidAddress();
 }

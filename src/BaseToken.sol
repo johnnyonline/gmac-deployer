@@ -74,6 +74,7 @@ abstract contract BaseToken is ReentrancyGuard {
             wnt.safeTransfer(treasury, _tax);
         }
 
+        // slither-disable-next-line unused-return
         univ2router.swapExactTokensForTokens(
             _amount, // amountIn
             _minOut, // amountOutMin

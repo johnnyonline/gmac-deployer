@@ -14,13 +14,13 @@ contract BaseERC20 is ERC20Capped, BaseToken {
         IUniswapV2Router01 _univ2router,
         FeeHelper _feeHelper,
         address _treasury,
-        string memory _name,
-        string memory _symbol,
-        uint256 _totalSupply
-    ) ERC20(_name, _symbol) ERC20Capped(_totalSupply) BaseToken(_wnt, _univ2router, _feeHelper, _treasury) {
+        string memory name_,
+        string memory symbol_,
+        uint256 totalSupply_
+    ) ERC20(name_, symbol_) ERC20Capped(totalSupply_) BaseToken(_wnt, _univ2router, _feeHelper, _treasury) {
         _mint(
             msg.sender, // TokenFactory
-            _totalSupply // maxSupply
+            totalSupply_ // maxSupply
         );
     }
 }
