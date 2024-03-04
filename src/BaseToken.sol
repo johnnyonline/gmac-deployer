@@ -7,7 +7,7 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 
 import {IUniswapV2Router01} from "@uniswap-periphery/interfaces/IUniswapV2Router01.sol";
 
-import {FeeHelper} from "./FeeHelper.sol";
+import {TaxHelper} from "./TaxHelper.sol";
 
 /// @title BaseToken
 /// @notice A base contract for all tokens
@@ -19,7 +19,7 @@ abstract contract BaseToken is ReentrancyGuard {
 
     IERC20 public immutable wnt;
     IUniswapV2Router01 public immutable univ2router;
-    FeeHelper public immutable feeHelper;
+    TaxHelper public immutable taxHelper;
 
     uint256 public constant SWAP_TAX = 25; // 0.25%
     uint256 public constant PRECISION = 10000;
@@ -28,10 +28,10 @@ abstract contract BaseToken is ReentrancyGuard {
     // Constructor
     // ============================================================================================
 
-    constructor(IERC20 _wnt, IUniswapV2Router01 _univ2router, FeeHelper _feeHelper, address _treasury) {
+    constructor(IERC20 _wnt, IUniswapV2Router01 _univ2router, TaxHelper _taxHelper, address _treasury) {
         wnt = _wnt;
         univ2router = _univ2router;
-        feeHelper = _feeHelper;
+        taxHelper = _taxHelper;
 
         treasury = _treasury;
     }
@@ -79,11 +79,11 @@ abstract contract BaseToken is ReentrancyGuard {
             _amount, // amountIn
             _minOut, // amountOutMin
             _path, // path
-            _fromToken ? address(feeHelper) : _receiver, // to
+            _fromToken ? address(taxHelper) : _receiver, // to
             block.timestamp // deadline
         );
 
-        if (_fromToken) _tax = feeHelper.taxAndTransfer(SWAP_TAX, PRECISION, address(wnt), _receiver, treasury);
+        if (_fromToken) _tax = taxHelper.taxAndTransfer(SWAP_TAX, PRECISION, address(wnt), _receiver, treasury);
 
         emit Swap(_tax, _fromToken);
     }

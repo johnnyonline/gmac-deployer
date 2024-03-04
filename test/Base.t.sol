@@ -7,7 +7,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IUniswapV2Router01} from "@uniswap-periphery/interfaces/IUniswapV2Router01.sol";
 import {IUniswapV2Factory} from "@uniswap-core/interfaces/IUniswapV2Factory.sol";
 
-import {BaseToken, FeeHelper, TokenFactory} from "src/TokenFactory.sol";
+import {BaseToken, TaxHelper, TokenFactory} from "src/TokenFactory.sol";
 
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
@@ -91,8 +91,8 @@ abstract contract Base is Test {
     // ============================================================================================
 
     function _deployFactory(IERC20 _wnt, IUniswapV2Router01 _univ2router, IUniswapV2Factory _univ2factory) internal returns (TokenFactory _factory) {
-        FeeHelper _feeHelper = new FeeHelper();
-        _factory = new TokenFactory(_wnt, _univ2router, _univ2factory, _feeHelper, TREASURY);
+        TaxHelper _taxHelper = new TaxHelper();
+        _factory = new TokenFactory(_wnt, _univ2router, _univ2factory, _taxHelper, TREASURY);
     }
 
     function _createUser(IERC20 _wnt) internal returns (address payable _user) {

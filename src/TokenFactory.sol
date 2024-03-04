@@ -7,7 +7,7 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 import {IUniswapV2Router01} from "@uniswap-periphery/interfaces/IUniswapV2Router01.sol";
 import {IUniswapV2Factory} from "@uniswap-core/interfaces/IUniswapV2Factory.sol";
 
-import {BaseERC20, BaseToken, FeeHelper, IERC20} from "./BaseERC20.sol";
+import {BaseERC20, BaseToken, TaxHelper, IERC20} from "./BaseERC20.sol";
 import {BaseERC404} from "./BaseERC404.sol";
 
 /// @title TokenFactory
@@ -21,7 +21,7 @@ contract TokenFactory is ReentrancyGuard {
     IERC20 public immutable wnt;
     IUniswapV2Router01 public immutable univ2router;
     IUniswapV2Factory public immutable univ2factory;
-    FeeHelper public immutable feeHelper;
+    TaxHelper public immutable taxHelper;
 
     // ============================================================================================
     // Constructor
@@ -31,7 +31,7 @@ contract TokenFactory is ReentrancyGuard {
         IERC20 _wnt,
         IUniswapV2Router01 _univ2router,
         IUniswapV2Factory _univ2factory,
-        FeeHelper _feeHelper,
+        TaxHelper _taxHelper,
         address _treasury
     ) {
         if (_treasury == address(0)) revert InvalidAddress();
@@ -39,7 +39,7 @@ contract TokenFactory is ReentrancyGuard {
         wnt = _wnt;
         univ2router = _univ2router;
         univ2factory = _univ2factory;
-        feeHelper = _feeHelper;
+        taxHelper = _taxHelper;
 
         treasury = _treasury;
     }
@@ -63,7 +63,7 @@ contract TokenFactory is ReentrancyGuard {
         BaseERC20 _token = new BaseERC20(
             wnt,
             univ2router,
-            feeHelper,
+            taxHelper,
             treasury,
             _name,
             _symbol,
@@ -90,7 +90,7 @@ contract TokenFactory is ReentrancyGuard {
         BaseERC404 _token = new BaseERC404(
             wnt,
             univ2router,
-            feeHelper,
+            taxHelper,
             treasury,
             _name,
             _symbol,

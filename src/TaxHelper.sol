@@ -4,10 +4,10 @@ pragma solidity 0.8.23;
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-/// @title FeeHelper
+/// @title TaxHelper
 /// @notice A helper contract to handle tax and transfer of WNTs
 /// @dev We use this contract because UniswapV2 can't send tokens to the token contract itself
-contract FeeHelper {
+contract TaxHelper {
 
     event TaxAndTransfer(uint256 amountAfterTax, uint256 taxAmount, address indexed token, address tokenReceiver, address taxReceiver);
 
