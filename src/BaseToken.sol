@@ -5,100 +5,97 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-import {IUniswapV2Router01} from "@uniswap/interfaces/IUniswapV2Router01.sol";
+import {IUniswapV2Router01} from "@uniswap-periphery/interfaces/IUniswapV2Router01.sol";
 
+import {FeeHelper} from "./FeeHelper.sol";
+
+/// @title BaseToken
+/// @notice A base contract for all tokens
 abstract contract BaseToken is ReentrancyGuard {
-
-    error InvalidAmount();
-
-    event AddLiquidityAndBurn(uint256 amountA, uint256 amountB);
-    event Swap(uint256 amount, uint256 amountOut, uint256 tax, bool fromToken);
 
     using SafeERC20 for IERC20;
 
-    address public immutable TREASURY;
+    address public immutable treasury;
 
-    uint256 public constant SWAP_FEE = 25; // 0.25%
+    IERC20 public immutable wnt;
+    IUniswapV2Router01 public immutable univ2router;
+    FeeHelper public immutable feeHelper;
+
+    uint256 public constant SWAP_TAX = 25; // 0.25%
     uint256 public constant PRECISION = 10000;
 
-    IERC20 public immutable WNT;
-    IUniswapV2Router01 public immutable UNIV2;
+    // ============================================================================================
+    // Constructor
+    // ============================================================================================
 
-    constructor(IERC20 _wnt, IUniswapV2Router01 _univ2, address _treasury) {
-        WNT = _wnt;
-        UNIV2 = _univ2;
+    constructor(IERC20 _wnt, IUniswapV2Router01 _univ2router, FeeHelper _feeHelper, address _treasury) {
+        wnt = _wnt;
+        univ2router = _univ2router;
+        feeHelper = _feeHelper;
 
-        TREASURY = _treasury;
+        treasury = _treasury;
     }
 
-    function addLiquidityAndBurn() external {
-        uint256 _amountA = IERC20(address(this)).balanceOf(address(this));
-        uint256 _amountB = WNT.balanceOf(address(this));
-        if (_amountA == 0 || _amountB == 0) revert InvalidAmount();
+    // ============================================================================================
+    // External Functions
+    // ============================================================================================
 
-        emit AddLiquidityAndBurn(_amountA, _amountB);
-
-        IERC20(address(this)).forceApprove(address(UNIV2), _amountA);
-        WNT.forceApprove(address(UNIV2), _amountB);
-
-        UNIV2.addLiquidity(
-            address(this), // tokenA
-            address(WNT), // tokenB
-            _amountA, // amountADesired
-            _amountB, // amountBDesired
-            _amountA, // amountAMin
-            _amountB, // amountBMin
-            address(0), // to
-            block.timestamp // deadline
-        );
-    }
-
+    /// @notice Swap tokens and pay tax
+    /// @param _amount The amount in
+    /// @param _minOut The minimum amount out
+    /// @param _receiver The receiver address
+    /// @param _fromToken True if from token, false if from WNT
     function swap(
         uint256 _amount,
         uint256 _minOut,
         address _receiver,
         bool _fromToken
-    ) external nonReentrant returns (uint256 _amountOut) {
+    ) external nonReentrant {
         if (_amount == 0) revert InvalidAmount();
 
         uint256 _tax = 0;
         address[] memory _path = new address[](2);
         if (_fromToken) {
             IERC20(address(this)).safeTransferFrom(msg.sender, address(this), _amount);
-            IERC20(address(this)).forceApprove(address(UNIV2), _amount);
+            IERC20(address(this)).forceApprove(address(univ2router), _amount);
 
             _path[0] = address(this);
-            _path[1] = address(WNT);
+            _path[1] = address(wnt);
         } else {
-            WNT.safeTransferFrom(msg.sender, address(this), _amount);
-            WNT.forceApprove(address(UNIV2), _amount);
+            wnt.safeTransferFrom(msg.sender, address(this), _amount);
+            wnt.forceApprove(address(univ2router), _amount);
 
-            _path[0] = address(WNT);
+            _path[0] = address(wnt);
             _path[1] = address(this);
 
-            _tax = _amount * SWAP_FEE / PRECISION;
+            _tax = _amount * SWAP_TAX / PRECISION;
             _amount -= _tax;
 
-            WNT.safeTransfer(TREASURY, _tax);
+            wnt.safeTransfer(treasury, _tax);
         }
 
-        _amountOut = UNIV2.swapExactTokensForTokens(
+        univ2router.swapExactTokensForTokens(
             _amount, // amountIn
             _minOut, // amountOutMin
             _path, // path
-            // address(this), // to
-            _fromToken ? address(this) : _receiver, // to
+            _fromToken ? address(feeHelper) : _receiver, // to
             block.timestamp // deadline
-        )[0];
+        );
 
-        if (_fromToken) {
-            _tax = _amountOut * SWAP_FEE / PRECISION;
-            _amountOut -= _tax;
+        if (_fromToken) _tax = feeHelper.taxAndTransfer(SWAP_TAX, PRECISION, address(wnt), _receiver, treasury);
 
-            WNT.safeTransfer(TREASURY, _tax);
-            WNT.safeTransfer(_receiver, _amountOut);
-        }
-
-        emit Swap(_amount, _amountOut, _tax, _fromToken);
+        emit Swap(_tax, _fromToken);
     }
+
+    // ============================================================================================
+    // Events
+    // ============================================================================================
+
+    event Swap(uint256 tax, bool fromToken);
+
+    // ============================================================================================
+    // Errors
+    // ============================================================================================
+
+    error InvalidAmount();
 }

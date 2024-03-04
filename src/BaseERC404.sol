@@ -6,8 +6,10 @@ import {DN404Mirror} from "@vectorized/DN404Mirror.sol";
 
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
-import {BaseToken, IUniswapV2Router01, IERC20} from "./BaseToken.sol";
+import {BaseToken, FeeHelper, IUniswapV2Router01, IERC20} from "./BaseToken.sol";
 
+/// @title BaseERC404
+/// @notice A standard ERC404 token
 contract BaseERC404 is DN404, BaseToken {
 
     string private _name;
@@ -16,21 +18,22 @@ contract BaseERC404 is DN404, BaseToken {
 
     constructor(
         IERC20 _wnt,
-        IUniswapV2Router01 _univ2,
+        IUniswapV2Router01 _univ2router,
+        FeeHelper _feeHelper,
         address _treasury,
         string memory name_,
         string memory symbol_,
         string memory baseURI_,
         uint96 _totalSupply
-    ) BaseToken(_wnt, _univ2, _treasury) {
+    ) BaseToken(_wnt, _univ2router, _feeHelper, _treasury) {
         _name = name_;
         _symbol = symbol_;
         _baseURI = baseURI_;
 
         _initializeDN404(
             _totalSupply, // initialTokenSupply
-            address(this), // initialSupplyOwner
-            address(new DN404Mirror(msg.sender)) // @todo address(this) / address(0) ?
+            msg.sender, // initialSupplyOwner, TokenFactory
+            address(new DN404Mirror(address(0))) // Mirror
         );
     }
 

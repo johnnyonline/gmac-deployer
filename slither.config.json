@@ -1,0 +1,14 @@
+{
+    "detectors_to_exclude": "",
+    "exclude_informational": false,
+    "exclude_low": false,
+    "exclude_medium": false,
+    "exclude_high": false,
+    "solc_remaps": [
+        "forge-std/=lib/forge-std/src/",
+        "@openzeppelin/=lib/openzeppelin-contracts/",
+        "@vectorized/=lib/dn404/src/",
+        "@uniswap-periphery/=lib/v2-periphery/contracts/",
+        "@uniswap-core/=lib/v2-core/contracts/"
+    ]
+}
