@@ -29,14 +29,12 @@ contract ERC20TokenFactory is BaseFactory {
     /// @param _name The token name
     /// @param _symbol The token symbol
     /// @param _totalSupply The total supply
-    /// @param _wntAmount The WNT amount
     /// @return The pair address and the token address
     function createERC20(
         string memory _name,
         string memory _symbol,
-        uint256 _totalSupply,
-        uint256 _wntAmount
-    ) external nonReentrant returns (address, address) {
+        uint256 _totalSupply
+    ) external payable nonReentrant returns (address, address) {
         BaseERC20 _token = new BaseERC20(
             wnt,
             univ2router,
@@ -49,6 +47,6 @@ contract ERC20TokenFactory is BaseFactory {
 
         emit TokenCreated(address(_token), _name, _symbol, _totalSupply);
 
-        return (_addLiquidityAndBurn(_wntAmount, address(_token)), address(_token));
+        return (_addLiquidityAndBurn(address(_token)), address(_token));
     }
 }

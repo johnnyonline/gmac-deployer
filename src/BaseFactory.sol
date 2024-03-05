@@ -2,6 +2,7 @@
 pragma solidity 0.8.23;
 
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 
 import {IUniswapV2Router01} from "@uniswap-periphery/interfaces/IUniswapV2Router01.sol";
 import {IUniswapV2Factory} from "@uniswap-core/interfaces/IUniswapV2Factory.sol";
@@ -13,6 +14,7 @@ import {TaxHelper, SafeERC20, IERC20} from "./TaxHelper.sol";
 abstract contract BaseFactory is ReentrancyGuard {
 
     using SafeERC20 for IERC20;
+    using Address for address payable;
 
     address public immutable treasury;
 
@@ -46,8 +48,10 @@ abstract contract BaseFactory is ReentrancyGuard {
     // Internal Functions
     // ============================================================================================
 
-    function _addLiquidityAndBurn(uint256 _wntAmount, address _token) internal returns (address _pair) {
-        wnt.safeTransferFrom(msg.sender, address(this), _wntAmount);
+    function _addLiquidityAndBurn(address _token) internal returns (address _pair) {
+        if (msg.value == 0) revert InvalidAmount();
+
+        payable(address(wnt)).functionCallWithValue(abi.encodeWithSignature("deposit()"), msg.value);
 
         uint256 _amountToken = IERC20(_token).balanceOf(address(this));
         uint256 _amountWNT = wnt.balanceOf(address(this));

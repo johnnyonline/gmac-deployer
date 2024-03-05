@@ -30,15 +30,13 @@ contract ERC404TokenFactory is BaseFactory {
     /// @param _symbol The token symbol
     /// @param _baseURI The base URI
     /// @param _totalSupply The total supply
-    /// @param _wntAmount The WNT amount
     /// @return The pair address and the token address
     function createERC404(
         string memory _name,
         string memory _symbol,
         string memory _baseURI,
-        uint96 _totalSupply,
-        uint256 _wntAmount
-    ) external nonReentrant returns (address, address) {
+        uint96 _totalSupply
+    ) external payable nonReentrant returns (address, address) {
         BaseERC404 _token = new BaseERC404(
             wnt,
             univ2router,
@@ -52,6 +50,6 @@ contract ERC404TokenFactory is BaseFactory {
 
         emit TokenCreated(address(_token), _name, _symbol, _totalSupply);
 
-        return (_addLiquidityAndBurn(_wntAmount, address(_token)), address(_token));
+        return (_addLiquidityAndBurn(address(_token)), address(_token));
     }
 }

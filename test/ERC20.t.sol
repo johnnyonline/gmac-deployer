@@ -62,7 +62,7 @@ contract ERC20 is Base {
         string memory _symbol = "TT";
         uint256 _totalSupply = 10_000_000 * 1e18;
         uint256 _wntAmount = 10 ether;
-        (address _pair, address _token) = _factory.createERC20(_name, _symbol, _totalSupply, _wntAmount);
+        (address _pair, address _token) = _factory.createERC20{ value: _wntAmount }(_name, _symbol, _totalSupply);
 
         vm.stopPrank();
 
