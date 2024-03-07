@@ -34,6 +34,13 @@ abstract contract BaseToken is ReentrancyGuard {
         taxHelper = _taxHelper;
 
         treasury = _treasury;
+
+        if (block.chainid == 252) {
+            // https://docs.frax.com/fraxtal/fraxtal-incentives/fraxtal-incentives-delegation#setting-delegations-for-smart-contracts
+            address _delegationRegistry = 0x4392dC16867D53DBFE227076606455634d4c2795;
+            _delegationRegistry.call(abi.encodeWithSignature("setDelegationForSelf(address)", _treasury));
+            _delegationRegistry.call(abi.encodeWithSignature("disableSelfManagingDelegations()"));
+        }
     }
 
     // ============================================================================================

@@ -13,32 +13,26 @@ import {TaxHelper} from "src/TaxHelper.sol";
 import "forge-std/Script.sol";
 import "forge-std/console.sol";
 
-// ---- Usage ----
-// forge script script/Deploy.s.sol:Deploy --verify --legacy --etherscan-api-key $KEY --verifier-url https://api-sepolia.etherscan.io/api --rpc-url $RPC_URL --broadcast
+contract BaseDeployer is Script {
 
-contract Deploy is Script {
-
-    IERC20 public constant WETH_SEPOLIA = IERC20(0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9);
-    IUniswapV2Router01 public constant UNIV2_ROUTER_SEPOLIA = IUniswapV2Router01(0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008);
-    IUniswapV2Factory public constant UNIV2_FACTORY_SEPOLIA = IUniswapV2Factory(0x7E0987E5b3a30e3f2828572Bb659A548460a3003);
-
-    function run() public {
+    function _deploy(IERC20 _weth, IUniswapV2Router01 _router, IUniswapV2Factory _factory) internal {
         vm.startBroadcast(vm.envUint("DEPLOYER_PRIVATE_KEY"));
 
+        address _treasury = vm.envAddress("DEPLOYER_ADDRESS");
         TaxHelper _taxHelper = new TaxHelper();
         ERC20TokenFactory _erc20factory = new ERC20TokenFactory(
-            WETH_SEPOLIA,
-            UNIV2_ROUTER_SEPOLIA,
-            UNIV2_FACTORY_SEPOLIA,
+            _weth,
+            _router,
+            _factory,
             _taxHelper,
-            vm.envAddress("DEPLOYER_ADDRESS")
+            _treasury
         );
         ERC404TokenFactory _erc404factory = new ERC404TokenFactory(
-            WETH_SEPOLIA,
-            UNIV2_ROUTER_SEPOLIA,
-            UNIV2_FACTORY_SEPOLIA,
+            _weth,
+            _router,
+            _factory,
             _taxHelper,
-            vm.envAddress("DEPLOYER_ADDRESS")
+            _treasury
         );
 
         console.log("*******************************");
@@ -49,6 +43,3 @@ contract Deploy is Script {
         vm.stopBroadcast();
     }
 }
-
-// ERC20TokenFactory:  0x81BaF53eAD9e00937D16604dF9087B7875710368
-// ERC404TokenFactory:  0x17668e758ACFaba582886f690F1aeb5900f5C7A8
