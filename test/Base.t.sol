@@ -144,13 +144,14 @@ abstract contract Base is Test {
 
         uint256 _userWntBalanceBefore = _wnt.balanceOf(_user);
         uint256 _userTokenBalanceBefore = IERC20(address(_token)).balanceOf(_user);
+        uint256 _treasuryWntBalanceBefore = _wnt.balanceOf(TREASURY);
         uint256 _amount = 1 ether;
         _wnt.forceApprove(address(_token), _amount);
         _token.swap(_amount, 0, _user, false);
 
         assertTrue(IERC20(address(_token)).balanceOf(_user) > 0, "_testSwap: E1");
         assertEq(_wnt.balanceOf(_user), _userWntBalanceBefore - 1 ether, "_testSwap: E2");
-        assertEq(_wnt.balanceOf(TREASURY), 0.0025 ether, "_testSwap: E3");
+        assertEq(_wnt.balanceOf(TREASURY), _treasuryWntBalanceBefore + 0.0025 ether, "_testSwap: E3");
         assertEq(_userTokenBalanceBefore, 0, "_testSwap: E4");
 
         // ************************
@@ -159,7 +160,7 @@ abstract contract Base is Test {
 
         _userWntBalanceBefore = _wnt.balanceOf(_user);
         _amount = IERC20(address(_token)).balanceOf(_user);
-        uint256 _treasuryWntBalanceBefore = _wnt.balanceOf(TREASURY);
+        _treasuryWntBalanceBefore = _wnt.balanceOf(TREASURY);
         IERC20(address(_token)).forceApprove(address(_token), _amount);
         _token.swap(_amount, 0, _user, true);
         uint256 _wntEarned = _wnt.balanceOf(_user) - _userWntBalanceBefore;

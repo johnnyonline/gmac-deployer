@@ -23,6 +23,9 @@ abstract contract BaseFactory is ReentrancyGuard {
     IUniswapV2Factory public immutable univ2factory;
     TaxHelper public immutable taxHelper;
 
+    uint256 public constant SWAP_TAX = 25; // 0.25%
+    uint256 public constant PRECISION = 10000;
+
     // ============================================================================================
     // Constructor
     // ============================================================================================
@@ -67,6 +70,11 @@ abstract contract BaseFactory is ReentrancyGuard {
 
         _pair = univ2factory.createPair(_token, address(wnt));
 
+        uint256 _amountTax = _amountWNT * SWAP_TAX / PRECISION;
+        wnt.safeTransfer(treasury, _amountTax);
+
+        _amountWNT -= _amountTax;
+
         IERC20(_token).forceApprove(address(univ2router), _amountToken);
         wnt.forceApprove(address(univ2router), _amountWNT);
 
@@ -82,14 +90,14 @@ abstract contract BaseFactory is ReentrancyGuard {
             block.timestamp // deadline
         );
 
-        emit AddLiquidityAndBurn(_amountToken, _amountWNT, _liquidity, _pair);
+        emit AddLiquidityAndBurn(_amountToken, _amountWNT, _amountTax, _liquidity, _pair);
     }
 
     // ============================================================================================
     // Events
     // ============================================================================================
 
-    event AddLiquidityAndBurn(uint256 amountToken, uint256 amountWNT, uint256 liquidity, address pair);
+    event AddLiquidityAndBurn(uint256 amountToken, uint256 amountWNT, uint256 amountTax, uint256 liquidity, address pair);
     event TokenCreated(address token, string name, string symbol, uint256 totalSupply);
 
     // ============================================================================================

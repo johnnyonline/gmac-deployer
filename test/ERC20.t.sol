@@ -62,6 +62,7 @@ contract ERC20 is Base {
         string memory _symbol = "TT";
         uint256 _totalSupply = 10_000_000 * 1e18;
         uint256 _wntAmount = 10 ether;
+        uint256 _fee = _wntAmount * 25 / 10000;
         (address _pair, address _token) = _factory.createERC20{ value: _wntAmount }(_name, _symbol, _totalSupply);
 
         vm.stopPrank();
@@ -70,6 +71,8 @@ contract ERC20 is Base {
         assertEq(IERC20(_token).balanceOf(_pair), _totalSupply, "_deployERC20AndTestFlow: E2");
         assertEq(IERC20(_token).balanceOf(_user), 0, "_deployERC20AndTestFlow: E3");
         assertEq(IERC20(_token).balanceOf(address(_factory)), 0, "_deployERC20AndTestFlow: E4");
+        assertEq(_wnt.balanceOf(_pair), _wntAmount - _fee, "_deployERC20AndTestFlow: E5");
+        assertEq(_wnt.balanceOf(TREASURY), _fee, "_deployERC20AndTestFlow: E6");
 
         _testSwap(BaseToken(_token), _wnt, _user);
     }
