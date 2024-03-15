@@ -70,7 +70,6 @@ abstract contract BaseToken is ReentrancyGuard {
             _path[1] = address(wnt);
         } else {
             wnt.safeTransferFrom(msg.sender, address(this), _amount);
-            wnt.forceApprove(address(univ2router), _amount);
 
             _path[0] = address(wnt);
             _path[1] = address(this);
@@ -78,6 +77,7 @@ abstract contract BaseToken is ReentrancyGuard {
             _tax = _amount * SWAP_TAX / PRECISION;
             _amount -= _tax;
 
+            wnt.forceApprove(address(univ2router), _amount);
             wnt.safeTransfer(treasury, _tax);
         }
 
