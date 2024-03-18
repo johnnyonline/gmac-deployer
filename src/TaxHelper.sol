@@ -11,9 +11,12 @@ contract TaxHelper {
 
     event TaxAndTransfer(uint256 amountAfterTax, uint256 taxAmount, address indexed token, address tokenReceiver, address taxReceiver);
 
+    error InsufficientAmountAfterTax();
+
     using SafeERC20 for IERC20;
 
     /// @notice Tax and transfer WNTs to the token receiver and the tax receiver
+    /// @param _minOut The minimum amount out
     /// @param _tax The tax amount
     /// @param _precision The precision
     /// @param _token The token address
@@ -21,6 +24,7 @@ contract TaxHelper {
     /// @param _taxReceiver The tax receiver address
     /// @return The tax amount
     function taxAndTransfer(
+        uint256 _minOut,
         uint256 _tax,
         uint256 _precision,
         address _token,
@@ -30,6 +34,7 @@ contract TaxHelper {
         uint256 _amount = IERC20(_token).balanceOf(address(this));
         uint256 _taxAmount = _amount * _tax / _precision;
         uint256 _amountAfterTax = _amount - _taxAmount;
+        if (_amountAfterTax < _minOut) revert InsufficientAmountAfterTax();
 
         emit TaxAndTransfer(_amountAfterTax, _taxAmount, _token, _tokenReceiver, _taxReceiver);
 

@@ -49,7 +49,8 @@ abstract contract BaseToken is ReentrancyGuard {
 
     /// @notice Swap tokens and pay tax
     /// @param _amount The amount in
-    /// @param _minOut The minimum amount out
+    /// @param _minOut The minimum amount out. If the swap is fromToken to WNT
+    ///                the _minOut is also checked after applying the tax
     /// @param _receiver The receiver address
     /// @param _fromToken True if from token, false if from WNT
     function swap(
@@ -90,7 +91,7 @@ abstract contract BaseToken is ReentrancyGuard {
             block.timestamp // deadline
         );
 
-        if (_fromToken) _tax = taxHelper.taxAndTransfer(SWAP_TAX, PRECISION, address(wnt), _receiver, treasury);
+        if (_fromToken) _tax = taxHelper.taxAndTransfer(_minOut, SWAP_TAX, PRECISION, address(wnt), _receiver, treasury);
 
         emit Swap(_tax, _fromToken);
     }
