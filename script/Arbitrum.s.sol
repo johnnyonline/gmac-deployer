@@ -8,11 +8,11 @@ import "./BaseDeployer.sol";
 
 contract Arbitrum is BaseDeployer {
 
-    IERC20 public constant WETH_SEPOLIA = IERC20(0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9);
-    IUniswapV2Router01 public constant UNIV2_ROUTER_SEPOLIA = IUniswapV2Router01(0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008);
-    IUniswapV2Factory public constant UNIV2_FACTORY_SEPOLIA = IUniswapV2Factory(0x7E0987E5b3a30e3f2828572Bb659A548460a3003);
+    IERC20 public constant WETH_ARBITRUM = IERC20(0x82aF49447D8a07e3bd95BD0d56f35241523fBab1);
+    IUniswapV2Router01 public constant UNIV2_ROUTER_ARBITRUM = IUniswapV2Router01(0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24);
+    IUniswapV2Factory public constant UNIV2_FACTORY_ARBITRUM = IUniswapV2Factory(0xf1D7CC64Fb4452F05c498126312eBE29f30Fbcf9);
 
     function run() public {
-        _deploy(WETH_SEPOLIA, UNIV2_ROUTER_SEPOLIA, UNIV2_FACTORY_SEPOLIA);
+        _deploy(WETH_ARBITRUM, UNIV2_ROUTER_ARBITRUM, UNIV2_FACTORY_ARBITRUM);
     }
 }
