@@ -26,6 +26,7 @@ abstract contract Base is Test {
         uint256 avalanche;
         uint256 goerli;
         uint256 sepolia;
+        uint256 base;
     }
 
     ForkIDs public forkIDs;
@@ -36,6 +37,7 @@ abstract contract Base is Test {
     address payable public userAvalanche;
     address payable public userGoerli;
     address payable public userSepolia;
+    address payable public userBase;
 
     address public constant TREASURY = address(0xD8984d5D0A68FD6ec1051C638906de686cD696E2);
 
@@ -45,18 +47,21 @@ abstract contract Base is Test {
     IERC20 public constant WAVAX = IERC20(0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7);
     IERC20 public constant WETH_GOERLI = IERC20(0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6);
     IERC20 public constant WETH_SEPOLIA = IERC20(0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9);
+    IERC20 public constant WETH_BASE = IERC20(0x4200000000000000000000000000000000000006);
 
     IUniswapV2Router01 public constant UNIV2_ROUTER_ETH = IUniswapV2Router01(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D); // also on Goerli
     IUniswapV2Router01 public constant UNIV2_ROUTER_ARBITRUM = IUniswapV2Router01(0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24);
     IUniswapV2Router01 public constant UNIV2_ROUTER_FRAXTAL = IUniswapV2Router01(0x2Dd1B4D4548aCCeA497050619965f91f78b3b532);
     IUniswapV2Router01 public constant UNIV2_ROUTER_AVAX = IUniswapV2Router01(0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24);
     IUniswapV2Router01 public constant UNIV2_ROUTER_SEPOLIA = IUniswapV2Router01(0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008);
+    IUniswapV2Router01 public constant UNIV2_ROUTER_BASE = IUniswapV2Router01(0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24);
 
     IUniswapV2Factory public constant UNIV2_FACTORY_ETH = IUniswapV2Factory(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f); // also on Goerli
     IUniswapV2Factory public constant UNIV2_FACTORY_ARBITRUM = IUniswapV2Factory(0xf1D7CC64Fb4452F05c498126312eBE29f30Fbcf9);
     IUniswapV2Factory public constant UNIV2_FACTORY_FRAXTAL = IUniswapV2Factory(0xE30521fe7f3bEB6Ad556887b50739d6C7CA667E6);
     IUniswapV2Factory public constant UNIV2_FACTORY_AVAX = IUniswapV2Factory(0x9e5A52f57b3038F1B8EeE45F28b3C1967e22799C);
     IUniswapV2Factory public constant UNIV2_FACTORY_SEPOLIA = IUniswapV2Factory(0x7E0987E5b3a30e3f2828572Bb659A548460a3003);
+    IUniswapV2Factory public constant UNIV2_FACTORY_BASE = IUniswapV2Factory(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f);
 
     ERC20TokenFactory public erc20TokenFactoryMainnet;
     ERC20TokenFactory public erc20TokenFactoryArbitrum;
@@ -64,6 +69,7 @@ abstract contract Base is Test {
     ERC20TokenFactory public erc20TokenFactoryAvalanche;
     ERC20TokenFactory public erc20TokenFactoryGoerli;
     ERC20TokenFactory public erc20TokenFactorySepolia;
+    ERC20TokenFactory public erc20TokenFactoryBase;
 
     ERC404TokenFactory public erc404TokenFactoryMainnet;
     ERC404TokenFactory public erc404TokenFactoryArbitrum;
@@ -71,6 +77,7 @@ abstract contract Base is Test {
     ERC404TokenFactory public erc404TokenFactoryAvalanche;
     ERC404TokenFactory public erc404TokenFactoryGoerli;
     ERC404TokenFactory public erc404TokenFactorySepolia;
+    ERC404TokenFactory public erc404TokenFactoryBase;
 
     // ============================================================================================
     // Test Setup
@@ -84,7 +91,8 @@ abstract contract Base is Test {
             fraxtal: vm.createFork(vm.envString("FRAXTAL_RPC_URL")),
             avalanche: vm.createFork(vm.envString("AVALANCHE_RPC_URL")),
             goerli: vm.createFork(vm.envString("GOERLI_RPC_URL")),
-            sepolia: vm.createFork(vm.envString("SEPOLIA_RPC_URL"))
+            sepolia: vm.createFork(vm.envString("SEPOLIA_RPC_URL")),
+            base: vm.createFork(vm.envString("BASE_RPC_URL"))
         });
 
         // deploy on Ethereum
@@ -116,6 +124,11 @@ abstract contract Base is Test {
         vm.selectFork(forkIDs.sepolia);
         userSepolia = _createUser(WETH_SEPOLIA);
         (erc20TokenFactorySepolia, erc404TokenFactorySepolia) = _deployFactory(WETH_SEPOLIA, UNIV2_ROUTER_SEPOLIA, UNIV2_FACTORY_SEPOLIA);
+
+        // deploy on Base
+        vm.selectFork(forkIDs.base);
+        userBase = _createUser(WETH_BASE);
+        (erc20TokenFactoryBase, erc404TokenFactoryBase) = _deployFactory(WETH_BASE, UNIV2_ROUTER_BASE, UNIV2_FACTORY_BASE);
     }
 
     // ============================================================================================

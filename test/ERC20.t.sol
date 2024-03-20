@@ -49,6 +49,11 @@ contract ERC20 is Base {
         _deployERC20AndTestFlow(erc20TokenFactorySepolia, WETH_SEPOLIA, userSepolia);
     }
 
+    function testBase() external {
+        vm.selectFork(forkIDs.base);
+        _deployERC20AndTestFlow(erc20TokenFactoryBase, WETH_BASE, userBase);
+    }
+
     // ============================================================================================
     // Internal Functions
     // ============================================================================================

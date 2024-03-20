@@ -49,6 +49,11 @@ contract ERC404 is Base {
         _deployERC404AndTestFlow(erc404TokenFactorySepolia, WETH_SEPOLIA, userSepolia);
     }
 
+    function testBase() external {
+        vm.selectFork(forkIDs.base);
+        _deployERC404AndTestFlow(erc404TokenFactoryBase, WETH_BASE, userBase);
+    }
+
     // ============================================================================================
     // Internal Functions
     // ============================================================================================
