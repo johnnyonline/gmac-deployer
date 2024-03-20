@@ -61,7 +61,7 @@ abstract contract Base is Test {
     IUniswapV2Factory public constant UNIV2_FACTORY_FRAXTAL = IUniswapV2Factory(0xE30521fe7f3bEB6Ad556887b50739d6C7CA667E6);
     IUniswapV2Factory public constant UNIV2_FACTORY_AVAX = IUniswapV2Factory(0x9e5A52f57b3038F1B8EeE45F28b3C1967e22799C);
     IUniswapV2Factory public constant UNIV2_FACTORY_SEPOLIA = IUniswapV2Factory(0x7E0987E5b3a30e3f2828572Bb659A548460a3003);
-    IUniswapV2Factory public constant UNIV2_FACTORY_BASE = IUniswapV2Factory(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f);
+    IUniswapV2Factory public constant UNIV2_FACTORY_BASE = IUniswapV2Factory(0x8909Dc15e40173Ff4699343b6eB8132c65e18eC6);
 
     ERC20TokenFactory public erc20TokenFactoryMainnet;
     ERC20TokenFactory public erc20TokenFactoryArbitrum;
